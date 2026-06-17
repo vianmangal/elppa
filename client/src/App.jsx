@@ -59,35 +59,6 @@ function createErrorState(code, message) {
   };
 }
 
-function parseSseChunk(chunk) {
-  if (!chunk.trim()) {
-    return null;
-  }
-
-  let event = "message";
-  const dataLines = [];
-
-  for (const line of chunk.split("\n")) {
-    if (line.startsWith("event:")) {
-      event = line.slice(6).trim();
-      continue;
-    }
-
-    if (line.startsWith("data:")) {
-      dataLines.push(line.slice(5).replace(/^ /, ""));
-    }
-  }
-
-  if (!dataLines.length) {
-    return null;
-  }
-
-  return {
-    event,
-    data: JSON.parse(dataLines.join("\n")),
-  };
-}
-
 function App() {
   const [url, setUrl] = useState("");
   const [analysis, setAnalysis] = useState("");
@@ -98,15 +69,12 @@ function App() {
   const [copied, setCopied] = useState(false);
   const deferredAnalysis = useDeferredValue(analysis);
 
-  const abortRef = useRef(null);
   const flushTimerRef = useRef(null);
   const pendingContentRef = useRef([]);
   const copyTimerRef = useRef(null);
 
   useEffect(() => {
     return () => {
-      abortRef.current?.abort();
-
       if (flushTimerRef.current) {
         window.clearInterval(flushTimerRef.current);
       }
@@ -168,7 +136,6 @@ function App() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    abortRef.current?.abort();
     resetStreamingBuffer();
     setCopied(false);
     setAnalysis("");
@@ -177,16 +144,11 @@ function App() {
     setLoading(true);
     setStatus("Fetching repository context...");
 
-    const controller = new AbortController();
-    abortRef.current = controller;
-
     try {
       const query = new URLSearchParams({
         url: url.trim(),
       });
-      const response = await fetch(`${API_BASE_URL}/api/repo/stream?${query}`, {
-        signal: controller.signal,
-      });
+      const response = await fetch(`${API_BASE_URL}/api/repo?${query}`);
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
@@ -197,80 +159,27 @@ function App() {
         };
       }
 
-      if (!response.body) {
-        throw {
-          code: "ANALYSIS_FAILED",
-          message: "Streaming is not available in this browser.",
-        };
-      }
+      const payload = await response.json();
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { value, done } = await reader.read();
-
-        if (done) {
-          break;
-        }
-
-        buffer += decoder.decode(value, {
-          stream: true,
-        });
-
-        const chunks = buffer.split("\n\n");
-        buffer = chunks.pop() || "";
-
-        for (const chunk of chunks) {
-          const parsed = parseSseChunk(chunk);
-
-          if (!parsed) {
-            continue;
-          }
-
-          if (parsed.event === "meta") {
-            setRepoData({
-              repository: parsed.data.repository,
-              tree: parsed.data.tree,
-              analyzedFiles: parsed.data.analyzedFiles,
-              cached: parsed.data.cached,
-            });
-            setStatus(
-              parsed.data.cached
-                ? "Loaded from cache and replaying the explanation..."
-                : "Streaming a fresh walkthrough..."
-            );
-            continue;
-          }
-
-          if (parsed.event === "delta") {
-            enqueueContent(parsed.data.content);
-            continue;
-          }
-
-          if (parsed.event === "error") {
-            throw {
-              code: parsed.data.code,
-              message: parsed.data.error,
-            };
-          }
-
-          if (parsed.event === "complete") {
-            setLoading(false);
-            setStatus(
-              parsed.data.cached
-                ? "Ready. This explanation came from the server cache."
-                : "Ready. Fresh analysis complete."
-            );
-          }
-        }
-      }
+      setRepoData({
+        repository: payload.repository,
+        tree: payload.tree,
+        analyzedFiles: payload.analyzedFiles,
+        cached: payload.cached,
+      });
+      setStatus(
+        payload.cached
+          ? "Loaded from cache and replaying the explanation..."
+          : "Generating the walkthrough..."
+      );
+      enqueueContent(payload.analysis || "");
+      setLoading(false);
+      setStatus(
+        payload.cached
+          ? "Ready. This explanation came from the server cache."
+          : "Ready. Fresh analysis complete."
+      );
     } catch (caughtError) {
-      if (caughtError?.name === "AbortError") {
-        return;
-      }
-
       setLoading(false);
       setStatus("");
       setError(
@@ -279,8 +188,6 @@ function App() {
           caughtError?.message || "Something went wrong while streaming the response."
         )
       );
-    } finally {
-      abortRef.current = null;
     }
   }
 
