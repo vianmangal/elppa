@@ -139,19 +139,25 @@ ${keyFiles || "No key files were available."}
 }
 
 async function streamRepoExplanation(repoData, options = {}) {
+  const analysis = await explainRepo(repoData);
+
+  if (typeof options.onChunk === "function") {
+    options.onChunk(analysis);
+  }
+
+  return analysis;
+}
+
+async function explainRepo(repoData) {
   const prompt = buildRepoPrompt(repoData);
   const client = createAiClient();
   const candidateModels = getCandidateModels();
   const errors = [];
 
   for (const model of candidateModels) {
-    let streamedText = "";
-    let emittedContent = false;
-
     try {
-      const stream = await client.chat.completions.create({
+      const completion = await client.chat.completions.create({
         model,
-        stream: true,
         messages: [
           {
             role: "user",
@@ -160,32 +166,15 @@ async function streamRepoExplanation(repoData, options = {}) {
         ],
       });
 
-      for await (const chunk of stream) {
-        const delta = extractText(chunk.choices?.[0]?.delta?.content);
+      const text = extractText(completion.choices?.[0]?.message?.content).trim();
 
-        if (!delta) {
-          continue;
-        }
-
-        emittedContent = true;
-        streamedText += delta;
-
-        if (typeof options.onChunk === "function") {
-          options.onChunk(delta);
-        }
-      }
-
-      if (!streamedText.trim()) {
+      if (!text) {
         throw new Error("OpenRouter returned an empty response.");
       }
 
-      return streamedText.trim();
+      return text;
     } catch (error) {
       console.error(`OpenRouter provider error for model ${model}:`, error);
-
-      if (emittedContent) {
-        throw error;
-      }
 
       errors.push(`${model}: ${error?.message || "Unknown provider error"}`);
     }
@@ -194,18 +183,6 @@ async function streamRepoExplanation(repoData, options = {}) {
   throw new Error(
     `Failed to generate repository analysis. Tried models: ${errors.join(" | ")}`
   );
-}
-
-async function explainRepo(repoData) {
-  let analysis = "";
-
-  analysis = await streamRepoExplanation(repoData, {
-    onChunk(chunk) {
-      analysis += chunk;
-    },
-  });
-
-  return analysis;
 }
 
 module.exports = {

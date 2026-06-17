@@ -7,7 +7,6 @@ const rateLimit = require("express-rate-limit");
 const app = express();
 const {
   explainRepo,
-  streamRepoExplanation,
 } = require("./services/aiService");
 const {
   parseGithubUrl,
@@ -267,16 +266,10 @@ app.get("/api/repo/stream", repoLimiter, async (req, res) => {
       cached: false,
     });
 
-    let streamedAnalysis = "";
+    const streamedAnalysis = await explainRepo(repoData);
 
-    await streamRepoExplanation(repoData, {
-      onChunk(chunk) {
-        streamedAnalysis += chunk;
-
-        writeSseEvent(res, "delta", {
-          content: chunk,
-        });
-      },
+    writeSseEvent(res, "delta", {
+      content: streamedAnalysis,
     });
 
     const payload = {
