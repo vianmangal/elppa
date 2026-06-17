@@ -142,8 +142,8 @@
 
 .repo-form input:focus {
   outline: none;
-  border-color: rgba(120, 230, 200, 0.45);
-  box-shadow: 0 0 0 4px rgba(120, 230, 200, 0.12);
+  border-color: rgba(126, 167, 255, 0.45);
+  box-shadow: 0 0 0 4px rgba(126, 167, 255, 0.12);
 }
 
 .repo-form input::placeholder {
@@ -157,8 +157,8 @@
 
 .repo-form button {
   min-width: 220px;
-  background: linear-gradient(135deg, #72e3c1, #5384ff);
-  color: #091017;
+  background: linear-gradient(135deg, #7aa3ff, #5384ff);
+  color: #eef3ff;
   padding: 16px 22px;
   box-shadow: 0 16px 32px rgba(83, 132, 255, 0.24);
 }
@@ -188,7 +188,7 @@
 }
 
 .live-pill {
-  background: rgba(120, 230, 200, 0.12);
+  background: rgba(126, 167, 255, 0.14);
   color: var(--color-accent);
 }
 
@@ -270,7 +270,7 @@
 }
 
 .status-chip {
-  background: rgba(120, 230, 200, 0.14);
+  background: rgba(126, 167, 255, 0.14);
   color: var(--color-accent);
 }
 
@@ -322,7 +322,7 @@
 .markdown-body code {
   font-family: var(--font-mono);
   font-size: 0.92em;
-  background: rgba(120, 230, 200, 0.12);
+  background: rgba(126, 167, 255, 0.12);
   border-radius: 8px;
   padding: 0.18rem 0.38rem;
 }
@@ -345,7 +345,7 @@
 .markdown-body blockquote {
   margin: 1.2rem 0;
   padding: 0.4rem 1rem;
-  border-left: 4px solid rgba(120, 230, 200, 0.35);
+  border-left: 4px solid rgba(126, 167, 255, 0.4);
   color: var(--color-muted);
   background: rgba(8, 12, 18, 0.72);
   border-radius: 0 14px 14px 0;
@@ -390,7 +390,7 @@
 }
 
 .tree-row--analyzed {
-  background: rgba(120, 230, 200, 0.1);
+  background: rgba(126, 167, 255, 0.12);
   color: var(--color-text);
 }
 
@@ -405,7 +405,7 @@
 
 .tree-badge {
   margin-left: auto;
-  background: rgba(120, 230, 200, 0.14);
+  background: rgba(126, 167, 255, 0.14);
   color: var(--color-accent);
 }
 
