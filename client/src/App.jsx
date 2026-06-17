@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import "./App.css";
+import DarkVeil from "./components/DarkVeil";
 import ExplanationDisplay from "./components/ExplanationDisplay";
 import FileTree from "./components/FileTree";
 import RepoInput from "./components/RepoInput";
@@ -286,82 +287,102 @@ function App() {
   const hasResults = Boolean(repoData || analysis || error);
 
   return (
-    <main className="app-shell">
-      <RepoInput
-        url={url}
-        onUrlChange={setUrl}
-        onSubmit={handleSubmit}
-        loading={loading}
-        status={status}
-      />
+    <>
+      <div className="app-background" aria-hidden="true">
+        <div className="app-background__veil">
+          <DarkVeil
+            hueShift={35}
+            noiseIntensity={0}
+            scanlineIntensity={0.2}
+            speed={0.6}
+            scanlineFrequency={0.5}
+            warpAmount={0}
+            resolutionScale={1}
+          />
+        </div>
+        <div className="app-background__overlay" />
+      </div>
 
-      {error && (
-        <section className="notice-panel notice-panel--error">
-          <p className="notice-panel__eyebrow">Request status</p>
-          <h2>{error.title}</h2>
-          <p>{error.message}</p>
-          <p className="notice-panel__hint">{error.hint}</p>
-        </section>
-      )}
+      <main className="app-shell">
+        <RepoInput
+          url={url}
+          onUrlChange={setUrl}
+          onSubmit={handleSubmit}
+          loading={loading}
+          status={status}
+        />
 
-      {hasResults && (
-        <section className="results-grid">
-          <div className="results-grid__main">
-            <ExplanationDisplay
-              content={deferredAnalysis}
-              loading={loading}
-              copied={copied}
-              onCopy={handleCopy}
-            />
-          </div>
+        {error && (
+          <section className="notice-panel notice-panel--error">
+            <p className="notice-panel__eyebrow">Request status</p>
+            <h2>{error.title}</h2>
+            <p>{error.message}</p>
+            <p className="notice-panel__hint">{error.hint}</p>
+          </section>
+        )}
 
-          <aside className="results-grid__side">
-            {repoData && (
-              <section className="panel">
-                <div className="panel__header">
-                  <div>
-                    <p className="panel__eyebrow">Repository</p>
-                    <h2>{repoData.repository.fullName}</h2>
-                  </div>
-
-                  {repoData.cached && <span className="status-chip">Cached</span>}
-                </div>
-
-                <p className="repo-summary">
-                  {repoData.repository.description || "No description provided."}
-                </p>
-
-                <dl className="repo-stats">
-                  <div>
-                    <dt>Language</dt>
-                    <dd>{repoData.repository.language || "Unknown"}</dd>
-                  </div>
-                  <div>
-                    <dt>Stars</dt>
-                    <dd>{repoData.repository.stars}</dd>
-                  </div>
-                  <div>
-                    <dt>Forks</dt>
-                    <dd>{repoData.repository.forks}</dd>
-                  </div>
-                  <div>
-                    <dt>Branch</dt>
-                    <dd>{repoData.repository.defaultBranch}</dd>
-                  </div>
-                </dl>
-              </section>
-            )}
-
-            {repoData && (
-              <FileTree
-                tree={repoData.tree}
-                analyzedFiles={repoData.analyzedFiles}
+        {hasResults && (
+          <section className="results-grid">
+            <div className="results-grid__main">
+              <ExplanationDisplay
+                content={deferredAnalysis}
+                loading={loading}
+                copied={copied}
+                onCopy={handleCopy}
               />
-            )}
-          </aside>
-        </section>
-      )}
-    </main>
+            </div>
+
+            <aside className="results-grid__side">
+              {repoData && (
+                <section className="panel">
+                  <div className="panel__header">
+                    <div>
+                      <p className="panel__eyebrow">Repository</p>
+                      <h2>{repoData.repository.fullName}</h2>
+                    </div>
+
+                    {repoData.cached && (
+                      <span className="status-chip">Cached</span>
+                    )}
+                  </div>
+
+                  <p className="repo-summary">
+                    {repoData.repository.description ||
+                      "No description provided."}
+                  </p>
+
+                  <dl className="repo-stats">
+                    <div>
+                      <dt>Language</dt>
+                      <dd>{repoData.repository.language || "Unknown"}</dd>
+                    </div>
+                    <div>
+                      <dt>Stars</dt>
+                      <dd>{repoData.repository.stars}</dd>
+                    </div>
+                    <div>
+                      <dt>Forks</dt>
+                      <dd>{repoData.repository.forks}</dd>
+                    </div>
+                    <div>
+                      <dt>Branch</dt>
+                      <dd>{repoData.repository.defaultBranch}</dd>
+                    </div>
+                  </dl>
+                </section>
+              )}
+
+              {repoData && (
+                <FileTree
+                  tree={repoData.tree}
+                  analyzedFiles={repoData.analyzedFiles}
+                />
+              )}
+            </aside>
+          </section>
+        )}
+      </main>
+    </>
   );
 }
 

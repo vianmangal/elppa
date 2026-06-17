@@ -1,4 +1,28 @@
+.app-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.app-background__veil {
+  position: absolute;
+  inset: 0;
+}
+
+.app-background__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(7, 8, 13, 0.68), rgba(9, 11, 16, 0.82)),
+    radial-gradient(circle at top left, rgba(173, 111, 255, 0.12), transparent 22%),
+    radial-gradient(circle at bottom right, rgba(92, 120, 255, 0.12), transparent 26%);
+}
+
 .app-shell {
+  position: relative;
+  z-index: 1;
   width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
   padding: 32px 0 64px;
