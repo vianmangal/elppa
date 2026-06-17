@@ -170,7 +170,7 @@ function writeSseEvent(res, event, data) {
 }
 
 function splitIntoWordishChunks(value) {
-  const chunks = value.match(/\S+\s*|\n/g);
+  const chunks = value.match(/\s+|\S+/g);
 
   return chunks || [value];
 }
