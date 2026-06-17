@@ -126,7 +126,7 @@ function App() {
   }
 
   function enqueueContent(content) {
-    pendingContentRef.current.push(content);
+    pendingContentRef.current.push(...Array.from(content));
 
     if (flushTimerRef.current) {
       return;

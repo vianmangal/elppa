@@ -169,12 +169,6 @@ function writeSseEvent(res, event, data) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 }
 
-function splitIntoWordishChunks(value) {
-  const chunks = value.match(/\s+|\S+/g);
-
-  return chunks || [value];
-}
-
 app.get("/", (req, res) => {
   res.send("Server running");
 });
@@ -253,11 +247,9 @@ app.get("/api/repo/stream", repoLimiter, async (req, res) => {
         cached: true,
       });
 
-      for (const chunk of splitIntoWordishChunks(cached.analysis)) {
-        writeSseEvent(res, "delta", {
-          content: chunk,
-        });
-      }
+      writeSseEvent(res, "delta", {
+        content: cached.analysis,
+      });
 
       writeSseEvent(res, "complete", {
         cached: true,
@@ -281,11 +273,9 @@ app.get("/api/repo/stream", repoLimiter, async (req, res) => {
       onChunk(chunk) {
         streamedAnalysis += chunk;
 
-        for (const part of splitIntoWordishChunks(chunk)) {
-          writeSseEvent(res, "delta", {
-            content: part,
-          });
-        }
+        writeSseEvent(res, "delta", {
+          content: chunk,
+        });
       },
     });
 
