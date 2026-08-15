@@ -16,6 +16,28 @@ const github = axios.create({
   },
 });
 
+const anonymousGithub = axios.create({
+  baseURL: "https://api.github.com",
+  headers: {
+    Accept: "application/vnd.github+json",
+  },
+});
+
+async function getGithub(path) {
+  try {
+    return await github.get(path);
+  } catch (error) {
+    // A stale token should not stop analysis of a public repository. GitHub's
+    // anonymous API can still serve it, albeit with a lower rate limit.
+    if (error.response?.status === 401 && token) {
+      console.warn("GitHub token was rejected; retrying the public request anonymously.");
+      return anonymousGithub.get(path);
+    }
+
+    throw error;
+  }
+}
+
 function parseGithubUrl(url) {
   try {
     const value = String(url || "").trim();
@@ -48,13 +70,13 @@ function parseGithubUrl(url) {
 }
 
 async function getRepoMetadata(owner, repo) {
-  const response = await github.get(`/repos/${owner}/${repo}`);
+  const response = await getGithub(`/repos/${owner}/${repo}`);
 
   return response.data;
 }
 
 async function getRepoTree(owner, repo) {
-  const response = await github.get(
+  const response = await getGithub(
     `/repos/${owner}/${repo}/git/trees/HEAD?recursive=1`
   );
 
@@ -63,7 +85,7 @@ async function getRepoTree(owner, repo) {
 
 async function getFileContent(owner, repo, path) {
   try {
-    const response = await github.get(`/repos/${owner}/${repo}/contents/${path}`);
+    const response = await getGithub(`/repos/${owner}/${repo}/contents/${path}`);
 
     if (!response.data.content) {
       return null;
