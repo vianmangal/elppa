@@ -14,7 +14,7 @@ Elppa helps developers understand an unfamiliar repository without reading every
 
 ## Features
 
-- Accepts full GitHub repository URLs and validates them server-side.
+- Accepts GitHub repository URLs with or without `https://` and validates them server-side.
 - Fetches repository metadata, the recursive file tree, and a curated set of important files through the GitHub API.
 - Generates an onboarding-style explanation covering purpose, architecture, stack, important files, local setup, and a suggested reading order.
 - Displays the repository tree and highlights files included in the analysis.
@@ -84,6 +84,9 @@ PORT=5001
 GITHUB_TOKEN=your_github_token
 OPENROUTER_API_KEY=your_openrouter_api_key
 
+# Keep the app usable if the AI provider is unavailable or its key is rotated.
+ENABLE_LOCAL_ANALYSIS_FALLBACK=true
+
 # Optional model overrides
 OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
 OPENROUTER_FALLBACK_MODELS=openrouter/free
@@ -116,7 +119,7 @@ Then start Vite:
 npm run dev
 ```
 
-Open the URL printed by Vite, paste a GitHub repository URL, and select **Analyze repository**.
+Open the URL printed by Vite, paste a GitHub repository URL such as `github.com/expressjs/express`, and select **Analyze repository**.
 
 ## API
 
@@ -127,6 +130,8 @@ Open the URL printed by Vite, paste a GitHub repository URL, and select **Analyz
 | `GET` | `/api/repo/stream?url=<github-url>` | Return the walkthrough through the event-stream endpoint |
 
 The analysis endpoint is limited to 10 requests per 15 minutes per client. Successful results are cached in memory for one hour.
+
+If OpenRouter rejects a key or is unavailable, Elppa serves a clearly labeled repository-derived overview by default. Set `ENABLE_LOCAL_ANALYSIS_FALLBACK=false` to return provider failures instead. A 401 from OpenRouter means the deployed `OPENROUTER_API_KEY` must be replaced with a valid key and the API redeployed.
 
 ## Project structure
 

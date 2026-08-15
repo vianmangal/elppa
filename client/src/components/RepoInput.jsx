@@ -4,7 +4,7 @@ function RepoInput({ url, onUrlChange, onSubmit, loading, status }) {
       <div className="hero-panel__content">
         <h1>Explain any public codebase.</h1>
         <p className="hero-panel__lede">
-          Paste a GitHub repository URL and watch the walkthrough stream in with
+          Paste a GitHub repository URL—with or without https://—and watch the walkthrough stream in with
           structure, context, and a visual map of the files that were analyzed.
         </p>
 
@@ -15,10 +15,11 @@ function RepoInput({ url, onUrlChange, onSubmit, loading, status }) {
 
           <input
             id="repo-url"
-            type="url"
+            type="text"
+            inputMode="url"
             value={url}
             onChange={(event) => onUrlChange(event.target.value)}
-            placeholder="https://github.com/expressjs/express"
+            placeholder="github.com/expressjs/express"
             autoComplete="off"
             spellCheck="false"
           />

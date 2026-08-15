@@ -6,7 +6,7 @@ const rateLimit = require("express-rate-limit");
 
 const app = express();
 const {
-  explainRepo,
+  getRepoExplanation,
 } = require("./services/aiService");
 const {
   parseGithubUrl,
@@ -106,7 +106,7 @@ function formatAppError(error) {
     return {
       status: 400,
       code: "INVALID_GITHUB_URL",
-      message: "Enter a valid GitHub repository URL like https://github.com/owner/repo.",
+      message: "Enter a GitHub repository URL like github.com/owner/repo.",
     };
   }
 
@@ -193,12 +193,13 @@ app.get("/api/repo", repoLimiter, async (req, res) => {
     }
 
     const repoData = await buildRepoPayload(url);
-    const analysis = await explainRepo(repoData);
+    const explanation = await getRepoExplanation(repoData);
     const payload = {
       repository: repoData.repository,
       tree: repoData.tree,
       analyzedFiles: repoData.analyzedFiles,
-      analysis,
+      analysis: explanation.content,
+      analysisSource: explanation.source,
     };
 
     setCachedAnalysis(url, payload);
@@ -243,6 +244,7 @@ app.get("/api/repo/stream", repoLimiter, async (req, res) => {
         repository: cached.repository,
         tree: cached.tree,
         analyzedFiles: cached.analyzedFiles,
+        analysisSource: cached.analysisSource,
         cached: true,
       });
 
@@ -266,7 +268,8 @@ app.get("/api/repo/stream", repoLimiter, async (req, res) => {
       cached: false,
     });
 
-    const streamedAnalysis = await explainRepo(repoData);
+    const explanation = await getRepoExplanation(repoData);
+    const streamedAnalysis = explanation.content;
 
     writeSseEvent(res, "delta", {
       content: streamedAnalysis,
@@ -277,6 +280,7 @@ app.get("/api/repo/stream", repoLimiter, async (req, res) => {
       tree: repoData.tree,
       analyzedFiles: repoData.analyzedFiles,
       analysis: streamedAnalysis,
+      analysisSource: explanation.source,
     };
 
     setCachedAnalysis(url, payload);

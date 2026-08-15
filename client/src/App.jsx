@@ -18,7 +18,7 @@ const API_BASE_URL = (
 const ERROR_MESSAGES = {
   INVALID_GITHUB_URL: {
     title: "Invalid repository URL",
-    hint: "Paste a full GitHub repository URL like https://github.com/expressjs/express.",
+    hint: "Paste a GitHub repository URL like github.com/expressjs/express.",
   },
   REPOSITORY_NOT_FOUND: {
     title: "Repository unavailable",
@@ -166,6 +166,7 @@ function App() {
         tree: payload.tree,
         analyzedFiles: payload.analyzedFiles,
         cached: payload.cached,
+        analysisSource: payload.analysisSource,
       });
       setStatus(
         payload.cached
@@ -248,9 +249,14 @@ function App() {
                       <h2>{repoData.repository.fullName}</h2>
                     </div>
 
-                    {repoData.cached && (
-                      <span className="status-chip">Cached</span>
-                    )}
+                    <div className="status-chips">
+                      {repoData.analysisSource === "local-fallback" && (
+                        <span className="status-chip status-chip--warning">
+                          Limited overview
+                        </span>
+                      )}
+                      {repoData.cached && <span className="status-chip">Cached</span>}
+                    </div>
                   </div>
 
                   <p className="repo-summary">

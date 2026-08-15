@@ -18,7 +18,11 @@ const github = axios.create({
 
 function parseGithubUrl(url) {
   try {
-    const parsed = new URL(url);
+    const value = String(url || "").trim();
+    const normalizedUrl = /^(?:www\.)?github\.com\//i.test(value)
+      ? `https://${value}`
+      : value;
+    const parsed = new URL(normalizedUrl);
     const hostname = parsed.hostname.toLowerCase();
 
     if (hostname !== "github.com" && hostname !== "www.github.com") {

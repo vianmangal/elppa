@@ -274,6 +274,18 @@
   color: var(--color-accent);
 }
 
+.status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.status-chip--warning {
+  background: rgba(255, 180, 82, 0.14);
+  color: #ffbe67;
+}
+
 .notice-panel--error {
   margin-bottom: 24px;
   border-color: rgba(255, 123, 123, 0.24);
