@@ -6,7 +6,7 @@
 
 **Turn a GitHub repository into a concise, AI-generated codebase walkthrough.**
 
-[Live demo](https://elppa.vercel.app) · [Report an issue](https://github.com/vianmangal/elppa/issues)
+[Live demo](https://elppa.vian1.tech) · [Report an issue](https://github.com/vianmangal/elppa/issues)
 
 </div>
 
