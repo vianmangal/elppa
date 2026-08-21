@@ -88,7 +88,7 @@ OPENROUTER_API_KEY=your_openrouter_api_key
 ENABLE_LOCAL_ANALYSIS_FALLBACK=true
 
 # Optional model overrides
-OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
+OPENROUTER_MODEL=openrouter/free
 OPENROUTER_FALLBACK_MODELS=openrouter/free
 ```
 

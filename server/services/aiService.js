@@ -3,12 +3,8 @@ require("dotenv").config();
 const OpenAI = require("openai");
 
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
-const DEFAULT_MODEL = "google/gemini-2.0-flash-exp:free";
-const FALLBACK_MODELS = [
-  "google/gemma-4-31b-it:free",
-  "google/gemma-4-26b-a4b-it:free",
-  "openrouter/free",
-];
+const DEFAULT_MODEL = "openrouter/free";
+const FALLBACK_MODELS = ["openrouter/free"];
 
 const LOCAL_FALLBACK_ENABLED =
   process.env.ENABLE_LOCAL_ANALYSIS_FALLBACK !== "false";
@@ -36,8 +32,16 @@ function hasConfiguredValue(value) {
     normalized !== "your_openrouter_api_key";
 }
 
+function normalizeApiKey(value) {
+  return String(value || "")
+    .trim()
+    .replace(/^OPENROUTER_API_KEY\s*=\s*/i, "")
+    .replace(/^['"]|['"]$/g, "")
+    .replace(/\s+/g, "");
+}
+
 function createAiClient() {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = normalizeApiKey(process.env.OPENROUTER_API_KEY);
 
   if (!hasConfiguredValue(apiKey)) {
     throw new Error(
@@ -48,6 +52,10 @@ function createAiClient() {
   return new OpenAI({
     apiKey,
     baseURL: OPENROUTER_BASE_URL,
+    defaultHeaders: {
+      "HTTP-Referer": "https://elppa.vian1.tech",
+      "X-Title": "Elppa",
+    },
   });
 }
 
@@ -358,5 +366,6 @@ module.exports = {
   buildLocalRepoExplanation,
   explainRepo,
   getRepoExplanation,
+  normalizeApiKey,
   streamRepoExplanation,
 };
