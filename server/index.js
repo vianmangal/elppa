@@ -19,6 +19,9 @@ const PORT = process.env.PORT || 5001;
 const CACHE_TTL_MS = 60 * 60 * 1000;
 const analysisCache = new Map();
 
+// Render terminates HTTPS and forwards the original client IP through one
+// reverse proxy. Trust that hop so express-rate-limit can identify clients.
+app.set("trust proxy", 1);
 app.use(cors());
 app.use(express.json());
 
