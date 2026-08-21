@@ -177,8 +177,7 @@
 }
 
 .live-pill,
-.status-chip,
-.tree-badge {
+.status-chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -213,6 +212,7 @@
 
 .panel__header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 16px;
   align-items: flex-start;
@@ -307,6 +307,7 @@
 
 .markdown-body {
   min-height: 240px;
+  min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -320,6 +321,18 @@
 .markdown-body h3 {
   margin-top: 1.5em;
   margin-bottom: 0.6em;
+}
+
+.markdown-body h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.markdown-body h2 {
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+}
+
+.markdown-body h3 {
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
 }
 
 .markdown-body ul,
@@ -391,69 +404,6 @@
 .analyzed-file span {
   color: var(--color-muted);
   font-size: 0.86rem;
-}
-
-.tree-disclosure {
-  margin-top: 18px;
-  border-top: 1px solid rgba(216, 226, 255, 0.08);
-  padding-top: 16px;
-}
-
-.tree-disclosure summary {
-  cursor: pointer;
-  color: var(--color-muted);
-  font-size: 0.92rem;
-}
-
-.tree-disclosure summary:hover {
-  color: var(--color-text);
-}
-
-.tree-shell {
-  margin-top: 14px;
-  max-height: 520px;
-  overflow: auto;
-  padding-right: 4px;
-}
-
-.tree-list {
-  list-style: none;
-  padding-left: 14px;
-  margin: 0;
-}
-
-.tree-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 10px;
-  border-radius: 12px;
-  color: var(--color-muted);
-}
-
-.tree-row--folder {
-  color: var(--color-text);
-  font-weight: 600;
-}
-
-.tree-row--analyzed {
-  background: rgba(126, 167, 255, 0.12);
-  color: var(--color-text);
-}
-
-.tree-row__icon {
-  width: 12px;
-  color: rgba(216, 226, 255, 0.5);
-}
-
-.tree-row__name {
-  overflow-wrap: anywhere;
-}
-
-.tree-badge {
-  margin-left: auto;
-  background: rgba(126, 167, 255, 0.14);
-  color: var(--color-accent);
 }
 
 .sr-only {

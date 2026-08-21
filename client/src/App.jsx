@@ -286,10 +286,7 @@ function App() {
               )}
 
               {repoData && (
-                <FileTree
-                  tree={repoData.tree}
-                  analyzedFiles={repoData.analyzedFiles}
-                />
+                <FileTree analyzedFiles={repoData.analyzedFiles} />
               )}
             </aside>
           </section>
