@@ -71,6 +71,28 @@ function TreeBranch({ nodes, analyzed }) {
   );
 }
 
+function describeAnalyzedFile(path) {
+  const filename = path.split("/").pop().toLowerCase();
+
+  if (filename === "readme.md") {
+    return "Project purpose, setup, and usage documentation";
+  }
+
+  if (filename === "package.json") {
+    return "Dependencies, scripts, and package metadata";
+  }
+
+  if (filename.includes("config")) {
+    return "Build or tooling configuration";
+  }
+
+  if (/^(index|main|app|server)\./.test(filename)) {
+    return "Likely application entry point";
+  }
+
+  return "Selected source context";
+}
+
 function FileTree({ tree, analyzedFiles }) {
   const analyzed = new Set(analyzedFiles);
   const nestedTree = buildTree(tree);
@@ -79,30 +101,35 @@ function FileTree({ tree, analyzedFiles }) {
     <section className="panel">
       <div className="panel__header">
         <div>
-          <p className="panel__eyebrow">Explorer</p>
-          <h2>Repository file tree</h2>
+          <p className="panel__eyebrow">AI context</p>
+          <h2>What the AI inspected</h2>
         </div>
       </div>
 
       <p className="panel__hint">
-        Highlighted files were included in the AI prompt for this explanation.
+        File paths help the AI understand the repository structure. Only the
+        selected files below were read in full.
       </p>
 
-      <div className="analyzed-list">
+      <div className="analyzed-list" aria-label="Files read by the AI">
         {analyzedFiles.length ? (
           analyzedFiles.map((file) => (
-            <span className="status-chip" key={file}>
-              {file}
-            </span>
+            <div className="analyzed-file" key={file}>
+              <code>{file}</code>
+              <span>{describeAnalyzedFile(file)}</span>
+            </div>
           ))
         ) : (
-          <span className="status-chip">No key files fetched</span>
+          <p className="panel__hint">No file contents were available.</p>
         )}
       </div>
 
-      <div className="tree-shell">
-        <TreeBranch nodes={nestedTree} analyzed={analyzed} />
-      </div>
+      <details className="tree-disclosure">
+        <summary>Browse the full repository tree ({tree.length} paths)</summary>
+        <div className="tree-shell">
+          <TreeBranch nodes={nestedTree} analyzed={analyzed} />
+        </div>
+      </details>
     </section>
   );
 }
